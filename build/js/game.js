@@ -420,7 +420,6 @@
       this.ctx.fillRect(325,115,200,100);
       this.ctx.fillStyle = "#000000";
       this.ctx.font = "16px PT Mono";
-      // this.ctx.fillText(messege, 335, 125);
       this._wrapText(this.ctx, messege, 340, 140, 170, 20);
     },
     /**
