@@ -1,7 +1,7 @@
 # Личный проект «Код и Магия» [![Build status][travis-image]][travis-url] [![Dependency status][dependency-image]][dependency-url]
 
 * Студент: [Алексей Радзимовский](https://up.htmlacademy.ru/javascript/4/user/80766).
-* Наставник: `Неизвестно`.
+* Наставник: `Евгений Лепёшкин`.
 
 ---
 
