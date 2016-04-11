@@ -13,7 +13,7 @@
     evt.preventDefault();
     formContainer.classList.add('invisible');
   };
-  // вводим переменные
+  // FFFFFвводим переменные
   // все элементы с именем review-mar
   var reviewMarks = document.querySelectorAll('input[name=review-mark]');
   // с айди review-name
