@@ -1,2 +1,3 @@
-require('./form');
-require('./game');
+'use strict';
+require('./form.js');
+require('./game.js');
