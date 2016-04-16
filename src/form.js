@@ -1,4 +1,6 @@
 'use strict';
+
+var browserCookies = require('browser-cookies');
 (function() {
   var formContainer = document.querySelector('.overlay-container');
   var formOpenButton = document.querySelector('.reviews-controls-new');
@@ -13,6 +15,22 @@
     evt.preventDefault();
     formContainer.classList.add('invisible');
   };
+
+  var reviewRating = document.querySelector('input[name="review-mark"]:checked').value;
+  function setCookie(Rating, Name) {
+    browserCookies.set('review-mark', Rating, { expires: expiresDay });
+    browserCookies.set('review-name', Name, { expires: expiresDay });
+  }
+  var DateNow = new Date();
+  var DateMyBirthdayInThisYear = new Date(DateNow.getFullYear(), 0, 9);
+  //
+  var expiresDay;
+
+  if(DateMyBirthdayInThisYear < DateNow) {
+    expiresDay = (DateNow - DateMyBirthdayInThisYear) / 1000 / 60 / 60 / 24;
+  } else {
+    expiresDay = (DateNow - new Date((DateNow.getFullYear() - 1), 0, 9)) / 1000 / 60 / 60 / 24;
+  }
   // FFFFFвводим переменные
   // все элементы с именем review-mar
   var reviewMarks = document.querySelectorAll('input[name=review-mark]');
@@ -40,11 +58,17 @@
   // отслеживаем изменение полей, если измениня есть запускаем функцию checkButtonState
   reviewName.oninput = checkButtonState;
   reviewText.oninput = checkButtonState;
+  reviewButton.onclick = function(e) {
+    e.preventDefault();
+    setCookie(reviewRating, reviewName.value);
+    document.querySelector('form.review-form').submit();
+  };
 
   // вводим функцию checkButtonState
   function checkButtonState() {
+    reviewRating = document.querySelector('input[name="review-mark"]:checked').value;
     // в ее теле пишем: переменная commentIsNeeded ровна, если  значение атрибута value у чекнутого инпута с именем review-mark меньше трех, то истина, иначе ложь
-    commentIsNeeded = document.querySelector('input[name="review-mark"]:checked').value < 3 ? true : false;
+    commentIsNeeded = reviewRating < 3 ? true : false;
     // если reviewName.value не равен "пусто"
     if (reviewName.value !== '') {
       // если. тут прямо смотрим знaчнение, кототоре приходит из 43 сточки (Оно может быть или тру или фалсе) Тру - меньше 3, нужен комментарий. Фалс - 3 или больше, комменатрий не нужен.
@@ -89,5 +113,15 @@
     }
     // атрибут кнопки disabled (который открывает за скрытие) получает значение (становиться зависим) от переменной isDisabledStatus (которая или тру или фолз), которая у нас по умолчанию фолз это написано в html и закреплено в строчке
     reviewButton.disabled = isDisabledStatus;
+  }
+  reviewName.value = browserCookies.get('review-name') || '';
+  if(browserCookies.get('review-mark') !== '') {
+    for (i = 0; i < reviewMarks.length; ++i) {
+      if(reviewMarks[i].value === browserCookies.get('review-mark')) {
+        reviewMarks[i].checked = true;
+      } else {
+        reviewMarks[i].checked = false;
+      }
+    }
   }
 })();
