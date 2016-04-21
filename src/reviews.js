@@ -2,6 +2,8 @@
 
 (function() {
 
+  document.querySelector('.reviews').classList.add('reviews-list-loading');
+
   var IMAGE_LOAD_TIMEOUT = 10000;
   var REVIEWS_LOAD_URL = '//o0.github.io/assets/json/reviews.json';
   // миллесекунд в двух неделях
@@ -57,26 +59,22 @@
     var xhr = new XMLHttpRequest();
 
     xhr.onload = function(evt) {
+      document.querySelector('.reviews').classList.remove('reviews-list-loading');
       var loadedData = JSON.parse(evt.target.response);
       callback(loadedData);
     };
 
-    xhr.open('GET', REVIEWS_LOAD_URL) = function() {
-      document.querySelector('.reviews').classList.remove('reviews-list-loading')
-    };
-    xhr.send = function() {
-      // добавляем прелаодер
-      document.querySelector('.reviews').classList.add('reviews-list-loading');
-    };
+    xhr.open('GET', REVIEWS_LOAD_URL);
+    xhr.send();
     // при ошибке добавил элменту .reviews класс reviews-load-failure
     xhr.onerrore = function() {
-      errorOrTimeout();
       document.querySelector('.reviews').classList.remove('reviews-list-loading');
+      errorOrTimeout();
     };
     xhr.timeout = 10000;
     xhr.ontimeout = function() {
-      errorOrTimeout();
       document.querySelector('.reviews').classList.remove('reviews-list-loading');
+      errorOrTimeout();
     };
   };
 
