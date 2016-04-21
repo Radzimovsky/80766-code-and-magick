@@ -67,7 +67,7 @@
     xhr.open('GET', REVIEWS_LOAD_URL);
     xhr.send();
     // при ошибке добавил элменту .reviews класс reviews-load-failure
-    xhr.onerrore = function() {
+    xhr.onerror = function() {
       document.querySelector('.reviews').classList.remove('reviews-list-loading');
       errorOrTimeout();
     };
