@@ -8,15 +8,18 @@
   var REVIEWS_LOAD_URL = '//o0.github.io/assets/json/reviews.json';
   // миллесекунд в двух неделях
   var RECENT_REVIEWS_TIME = 1000 * 3600 * 24;
+  var PAGE_SIZE = 3;
 
   var reviewContainer = document.querySelector('.reviews-list');
   var filters = document.querySelector('.reviews-filter');
   var templateElement = document.querySelector('#review-template');
   var filtersContainer = document.querySelector('.reviews-filter');
   var elementToClone;
+  var pageNumber = 1;
   var errorOrTimeout = function() {
     document.querySelector('.reviews').classList.add('reviews-load-failure');
   };
+  var nextPageButton = document.querySelector('.reviews-controls-more');
 
   filters.classList.add('invisible');
 
@@ -78,13 +81,37 @@
     };
   };
 
-  var renderReviews = function(reviews) {
+  var isNextPageAvailable = function(reviews, page, pageSize) {
+    return page < Math.floor(reviews.length / pageSize);
+  };
+
+  var renderReviews = function(reviews, page) {
     reviewContainer.innerHTML = '';
 
-    reviews.forEach(function(review) {
+    // var from = page * PAGE_SIZE;
+    var to = PAGE_SIZE * page;
+    console.log(to);
+    reviews.slice(0, to).forEach(function(review) {
       createReviewElement(review, reviewContainer);
     });
   };
+
+  var renderNextPages = function(reset) {
+    console.log(reset);
+    if (reset) {
+      reviewContainer.innerHTML = '';
+    }
+
+    if (isNextPageAvailable(reviews, pageNumber, PAGE_SIZE)) {
+      nextPageButton.classList.remove('invisible');
+      pageNumber++;
+      renderReviews(reviews, pageNumber);
+    }
+  };
+
+  nextPageButton.addEventListener('click', function(){
+    renderNextPages(true);
+  });
 
   var setFiltrationEnabled = function() {
     var filterNodes = filtersContainer.querySelectorAll('input[name=reviews]');
@@ -96,9 +123,10 @@
   };
 
   var setFilterEnabled = function(filter) {
+    pageNumber = 1;
     var filteredReviews = getFilteredReviews(window.reviews, filter);
-
-    renderReviews(filteredReviews);
+    renderNextPages(true);
+    // renderReviews(filteredReviews, 0);
   };
 
   var getFilteredReviews = function(reviews, filter) {
@@ -160,7 +188,7 @@
   getReviews(function(loadedReviews) {
     window.reviews = loadedReviews;
     setFiltrationEnabled();
-    renderReviews(window.reviews);
+    renderReviews(window.reviews, 1);
   });
 
   filters.classList.remove('invisible');
