@@ -8,15 +8,19 @@
   var REVIEWS_LOAD_URL = '//o0.github.io/assets/json/reviews.json';
   // миллесекунд в двух неделях
   var RECENT_REVIEWS_TIME = 1000 * 3600 * 24;
+  var PAGE_SIZE = 3;
 
   var reviewContainer = document.querySelector('.reviews-list');
   var filters = document.querySelector('.reviews-filter');
   var templateElement = document.querySelector('#review-template');
   var filtersContainer = document.querySelector('.reviews-filter');
   var elementToClone;
+  var pageNumber = 0;
+  var filteredReviews = [];
   var errorOrTimeout = function() {
     document.querySelector('.reviews').classList.add('reviews-load-failure');
   };
+  var nextPageButton = document.querySelector('.reviews-controls-more');
 
   filters.classList.add('invisible');
 
@@ -54,7 +58,7 @@
 
     return element;
   }
-
+  // объявление основной функции
   var getReviews = function(callback) {
     var xhr = new XMLHttpRequest();
 
@@ -67,7 +71,7 @@
     xhr.open('GET', REVIEWS_LOAD_URL);
     xhr.send();
     // при ошибке добавил элменту .reviews класс reviews-load-failure
-    xhr.onerrore = function() {
+    xhr.onerror = function() {
       document.querySelector('.reviews').classList.remove('reviews-list-loading');
       errorOrTimeout();
     };
@@ -78,27 +82,62 @@
     };
   };
 
-  var renderReviews = function(reviews) {
-    reviewContainer.innerHTML = '';
-
-    reviews.forEach(function(review) {
-      createReviewElement(review, reviewContainer);
-    });
+  // объявляем функцию
+  var isNextPageAvailable = function(reviews, page, pageSize) {
+    return page < Math.floor(reviews.length / pageSize);
   };
 
-  var setFiltrationEnabled = function() {
-    var filterNodes = filtersContainer.querySelectorAll('input[name=reviews]');
-    for (var i = 0; i < filters.length; i++) {
-      filterNodes[i].onchange = function() {
-        setFilterEnabled(this.id);
-      };
+  // отрисовака отзывов
+  var renderReviews = function(reviews, page) {
+    // чистим контейнер с отзывами
+    reviewContainer.innerHTML = '';
+
+    // задаем переменные для страниц
+    // с чего начинаем - страница умножиная на размер х*3 = 1,3,6 и т.д.
+    var from = page * PAGE_SIZE;
+    // окончание диапазона - фром + 3
+    var to = from + PAGE_SIZE;
+
+    // slice - метов, который говорит нам взять 0 по текущий to, далее метод forEach перебирает массив... и я не могу это объяснить???
+    reviews.slice(0, to).forEach(function(review) {
+      // отдельный отзыв
+      createReviewElement(review, reviewContainer);
+    });
+
+    if (isNextPageAvailable(reviews, pageNumber, PAGE_SIZE)) {
+      nextPageButton.classList.remove('invisible');
+    } else {
+      nextPageButton.classList.add('invisible');
     }
   };
 
-  var setFilterEnabled = function(filter) {
-    var filteredReviews = getFilteredReviews(window.reviews, filter);
+  // функция вывода следующих страниц
+  var renderNextPages = function() {
+    reviewContainer.innerHTML = '';
+    if (isNextPageAvailable(filteredReviews, pageNumber, PAGE_SIZE)) {
+      pageNumber++;
+      renderReviews(filteredReviews, pageNumber);
+    }
+  };
+  nextPageButton.addEventListener('click', function() {
+    renderNextPages();
+  });
 
-    renderReviews(filteredReviews);
+  var setFiltrationEnabled = function() {
+    // контренеру добавляем событие клик и какую-то??? функцию
+    filtersContainer.addEventListener('click', function(evt) {
+      // не понимаю ???
+      if (evt.target.classList.contains('reviews-filter-item')) {
+        setFilterEnabled(evt.target.previousSibling.id);
+      }
+    });
+  };
+
+  // не пониимаю, чем setFiltrationEnabled отличается от setFilterEnabled ???
+  var setFilterEnabled = function(filter) {
+    filteredReviews = getFilteredReviews(window.reviews, filter);
+    pageNumber = 0;
+    renderReviews(filteredReviews, 0);
   };
 
   var getFilteredReviews = function(reviews, filter) {
@@ -157,10 +196,14 @@
     return reviewsToFilter;
   };
 
+  // ВОТ ЭТО ГЛАВНАЯ ФУНКЦИЯ ВЫЗОВА!!!
   getReviews(function(loadedReviews) {
+    // это вызывает массив отзывов - ???
     window.reviews = loadedReviews;
+    // это фильтрует список
     setFiltrationEnabled();
-    renderReviews(window.reviews);
+    // отрисовку 3ех элементов
+    renderReviews(loadedReviews, 0);
   });
 
   filters.classList.remove('invisible');
