@@ -15,7 +15,8 @@
   var templateElement = document.querySelector('#review-template');
   var filtersContainer = document.querySelector('.reviews-filter');
   var elementToClone;
-  var pageNumber = 1;
+  var pageNumber = 0;
+  var filteredReviews = [];
   var errorOrTimeout = function() {
     document.querySelector('.reviews').classList.add('reviews-load-failure');
   };
@@ -57,7 +58,7 @@
 
     return element;
   }
-
+  // объявление основной функции
   var getReviews = function(callback) {
     var xhr = new XMLHttpRequest();
 
@@ -81,52 +82,62 @@
     };
   };
 
+  // объявляем функцию
   var isNextPageAvailable = function(reviews, page, pageSize) {
     return page < Math.floor(reviews.length / pageSize);
   };
 
+  // отрисовака отзывов
   var renderReviews = function(reviews, page) {
+    // чистим контейнер с отзывами
     reviewContainer.innerHTML = '';
 
-    // var from = page * PAGE_SIZE;
-    var to = PAGE_SIZE * page;
-    console.log(to);
+    // задаем переменные для страниц
+    // с чего начинаем - страница умножиная на размер х*3 = 1,3,6 и т.д.
+    var from = page * PAGE_SIZE;
+    // окончание диапазона - фром + 3
+    var to = from + PAGE_SIZE;
+
+    // slice - метов, который говорит нам взять 0 по текущий to, далее метод forEach перебирает массив... и я не могу это объяснить???
     reviews.slice(0, to).forEach(function(review) {
+      // отдельный отзыв
       createReviewElement(review, reviewContainer);
     });
-  };
-
-  var renderNextPages = function(reset) {
-    console.log(reset);
-    if (reset) {
-      reviewContainer.innerHTML = '';
-    }
 
     if (isNextPageAvailable(reviews, pageNumber, PAGE_SIZE)) {
       nextPageButton.classList.remove('invisible');
-      pageNumber++;
-      renderReviews(reviews, pageNumber);
+    } else {
+      nextPageButton.classList.add('invisible');
     }
   };
 
-  nextPageButton.addEventListener('click', function(){
-    renderNextPages(true);
+  // функция вывода следующих страниц
+  var renderNextPages = function() {
+    reviewContainer.innerHTML = '';
+    if (isNextPageAvailable(filteredReviews, pageNumber, PAGE_SIZE)) {
+      pageNumber++;
+      renderReviews(filteredReviews, pageNumber);
+    }
+  };
+  nextPageButton.addEventListener('click', function() {
+    renderNextPages();
   });
 
   var setFiltrationEnabled = function() {
-    var filterNodes = filtersContainer.querySelectorAll('input[name=reviews]');
-    for (var i = 0; i < filters.length; i++) {
-      filterNodes[i].onchange = function() {
-        setFilterEnabled(this.id);
-      };
-    }
+    // контренеру добавляем событие клик и какую-то??? функцию
+    filtersContainer.addEventListener('click', function(evt) {
+      // не понимаю ???
+      if (evt.target.classList.contains('reviews-filter-item')) {
+        setFilterEnabled(evt.target.previousSibling.id);
+      }
+    });
   };
 
+  // не пониимаю, чем setFiltrationEnabled отличается от setFilterEnabled ???
   var setFilterEnabled = function(filter) {
-    pageNumber = 1;
-    var filteredReviews = getFilteredReviews(window.reviews, filter);
-    renderNextPages(true);
-    // renderReviews(filteredReviews, 0);
+    filteredReviews = getFilteredReviews(window.reviews, filter);
+    pageNumber = 0;
+    renderReviews(filteredReviews, 0);
   };
 
   var getFilteredReviews = function(reviews, filter) {
@@ -185,10 +196,14 @@
     return reviewsToFilter;
   };
 
+  // ВОТ ЭТО ГЛАВНАЯ ФУНКЦИЯ ВЫЗОВА!!!
   getReviews(function(loadedReviews) {
+    // это вызывает массив отзывов - ???
     window.reviews = loadedReviews;
+    // это фильтрует список
     setFiltrationEnabled();
-    renderReviews(window.reviews, 1);
+    // отрисовку 3ех элементов
+    renderReviews(loadedReviews, 0);
   });
 
   filters.classList.remove('invisible');
