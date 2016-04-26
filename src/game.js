@@ -705,6 +705,27 @@
     }
   };
 
+  var setScrollEnabled = function() {
+    var scrollTimeout;
+
+    window.addEventListener('scroll', function() {
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(function() {
+        var positionCloud = document.querySelector('.header-clouds').getBoundingClientRect();
+        var offset = positionCloud.top;
+        if(positionCloud.bottom > 0) {
+          positionCloud.style.backgroundPosition = 50 + (offset / 4) + '% 0';
+        }
+        var gamePosition = document.querySelector('.demo').getBoundingClientRect();
+        if(gamePosition.bottom <= 0) {
+          game.setGameStatus(window.Game.Verdict.PAUSE);
+        }
+      }, 100);
+    });
+  };
+
+  setScrollEnabled();
+
   window.Game = Game;
   window.Game.Verdict = Verdict;
 
