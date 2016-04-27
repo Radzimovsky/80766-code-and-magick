@@ -393,33 +393,32 @@
           break;
       }
     },
-    _wrapText: function(context, text, marginLeft, marginTop, maxWidth, lineHeight){
-        var words = text.split(" ");
-        var countWords = words.length;
-        var line = "";
-        for (var n = 0; n < countWords; n++) {
-            var testLine = line + words[n] + " ";
-            var testWidth = context.measureText(testLine).width;
-            if (testWidth > maxWidth) {
-                context.fillText(line, marginLeft, marginTop);
-                line = words[n] + " ";
-                marginTop += lineHeight;
-            }
-            else {
-                line = testLine;
-            }
+    _wrapText: function(context, text, marginLeft, marginTop, maxWidth, lineHeight) {
+      var words = text.split(' ');
+      var countWords = words.length;
+      var line = '';
+      for (var n = 0; n < countWords; n++) {
+        var testLine = line + words[n] + ' ';
+        var testWidth = context.measureText(testLine).width;
+        if (testWidth > maxWidth) {
+          context.fillText(line, marginLeft, marginTop);
+          line = words[n] + ' ';
+          marginTop += lineHeight;
+        } else {
+          line = testLine;
         }
-        context.fillText(line, marginLeft, marginTop);
+      }
+      context.fillText(line, marginLeft, marginTop);
     },
     _drawMessage: function(messege) {
       this.ctx.beginPath();
-      this.ctx.moveTo(0,0);
-      this.ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
-      this.ctx.fillRect(330,120,200,100);
-      this.ctx.fillStyle = "#ffffff";
-      this.ctx.fillRect(325,115,200,100);
-      this.ctx.fillStyle = "#000000";
-      this.ctx.font = "16px PT Mono";
+      this.ctx.moveTo(0, 0);
+      this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+      this.ctx.fillRect(330, 120, 200, 100);
+      this.ctx.fillStyle = '#ffffff';
+      this.ctx.fillRect(325, 115, 200, 100);
+      this.ctx.fillStyle = '#000000';
+      this.ctx.font = '16px PT Mono';
       this._wrapText(this.ctx, messege, 340, 140, 170, 20);
     },
     /**
@@ -705,6 +704,27 @@
       window.removeEventListener('keyup', this._onKeyUp);
     }
   };
+
+  var setScrollEnabled = function() {
+    var scrollTimeout;
+
+    window.addEventListener('scroll', function() {
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(function() {
+        var positionCloud = document.querySelector('.header-clouds').getBoundingClientRect();
+        var offset = positionCloud.top;
+        if(positionCloud.bottom > 0) {
+          positionCloud.style.backgroundPosition = 50 + (offset / 4) + '% 0';
+        }
+        var gamePosition = document.querySelector('.demo').getBoundingClientRect();
+        if(gamePosition.bottom <= 0) {
+          game.setGameStatus(window.Game.Verdict.PAUSE);
+        }
+      }, 100);
+    });
+  };
+
+  setScrollEnabled();
 
   window.Game = Game;
   window.Game.Verdict = Verdict;
