@@ -1,6 +1,6 @@
 'use strict';
 
-(function() {
+define(function() {
 
   document.querySelector('.reviews').classList.add('reviews-list-loading');
 
