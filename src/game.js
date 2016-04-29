@@ -1,6 +1,6 @@
 'use strict';
 
-(function() {
+module.exports = function() {
   /**
    * @const
    * @type {number}
@@ -711,10 +711,11 @@
     window.addEventListener('scroll', function() {
       clearTimeout(scrollTimeout);
       scrollTimeout = setTimeout(function() {
-        var positionCloud = document.querySelector('.header-clouds').getBoundingClientRect();
+        var Cloud = document.querySelector('.header-clouds');
+        var positionCloud = Cloud.getBoundingClientRect();
         var offset = positionCloud.top;
         if(positionCloud.bottom > 0) {
-          positionCloud.style.backgroundPosition = 50 + (offset / 4) + '% 0';
+          Cloud.style.backgroundPosition = 50 + (offset / 4) + '% 0';
         }
         var gamePosition = document.querySelector('.demo').getBoundingClientRect();
         if(gamePosition.bottom <= 0) {
@@ -732,4 +733,4 @@
   var game = new Game(document.querySelector('.demo'));
   game.initializeLevelAndStart();
   game.setGameStatus(window.Game.Verdict.INTRO);
-})();
+};
