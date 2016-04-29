@@ -1,11 +1,8 @@
 'use strict';
-// require('./form.js');
-// require('./game.js');
-// require('./reviews.js');
+var form = require('./form.js');
+var game = require('./game.js');
+var reviews = require('./reviews.js');
 
-
-require([
-  './form',
-  './game',
-  './reviews'
-]);
+form();
+game();
+reviews();
