@@ -1,6 +1,6 @@
 'use strict';
 
-(function() {
+module.exports = function() {
 
   document.querySelector('.reviews').classList.add('reviews-list-loading');
 
@@ -207,4 +207,4 @@
   });
 
   filters.classList.remove('invisible');
-})();
+};
